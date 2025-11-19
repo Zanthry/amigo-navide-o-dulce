@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Amigo Secreto Dulce</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f9f9f9, #dbe9ff);
+    color: #333;
+    max-width: 540px;
+    margin: 40px auto;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgb(40 50 70 / 0.2);
+  }
+  h1 {
+    color: #003366;
+    text-align: center;
+  }
+  label {
+    margin-top: 15px;
+    display: block;
+    font-weight: 600;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-top: 8px;
+    border: 2px solid #005cbf;
+    border-radius: 8px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+  }
+  input[type="text"]:focus {
+    border-color: #1a73e8;
+    outline: none;
+  }
+  button {
+    margin-top: 20px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    padding: 14px 20px;
+    font-size: 17px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 700;
+    transition: background-color 0.3s ease;
+  }
+  button:hover:enabled {
+    background-color: #005fa3;
+  }
+  button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  #resultado {
+    margin-top: 25px;
+    background-color: #eef6ff;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #0077cc;
+    font-size: 18px;
+    min-height: 70px;
+  }
+  #resultado p {
+    margin: 10px 0;
+  }
+  #mensaje-error {
+    color: #bb2124;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+  <h1>Consulta Amigo Secreto Dulce</h1>
+
+  <label for="cedulaInput">Ingresa tu Cédula</label>
+  <input type="text" id="cedulaInput" placeholder="Ejemplo: 1010205368" autocomplete="off" disabled />
+
+  <button type="button" id="buscarBtn" onclick="buscarAsignado()" disabled>Buscar</button>
+
+  <div id="resultado">Cargando datos, por favor espera...</div>
+
+<script>
+let datos = [];
+
+function activarBusqueda(activar) {
+  document.getElementById('cedulaInput').disabled = !activar;
+  document.getElementById('buscarBtn').disabled = !activar;
+}
+
+function buscarAsignado() {
+  const cedula = document.getElementById('cedulaInput').value.trim();
+  const resultadoDiv = document.getElementById('resultado');
+  
+  if (!cedula) {
+    resultadoDiv.innerHTML = '<p id="mensaje-error">Por favor, ingresa tu cédula.</p>';
+    return;
+  }
+
+  const encontrado = datos.find(item => item.cedula === cedula);
+  
+  if (encontrado) {
+    resultadoDiv.innerHTML = `
+      <p>Tu asignado es: <strong>${encontrado.asignadoNombre}</strong></p>
+      <p>Dulce que debes llevar: <strong>${encontrado.dulce}</strong></p>
+    `;
+  } else {
+    resultadoDiv.innerHTML = '<p id="mensaje-error">Cédula no encontrada. Por favor verifica e intenta de nuevo.</p>';
+  }
+}
+
+// Carga el JSON externo
+fetch('datos.json')
+  .then(response => {
+    if (!response.ok) throw new Error('No se pudo cargar el archivo JSON.');
+    return response.json();
+  })
+  .then(jsonData => {
+    datos = jsonData;
+    document.getElementById('resultado').innerHTML = 'Datos cargados correctamente. Ya puedes buscar.';
+    activarBusqueda(true);
+  })
+  .catch(error => {
+    document.getElementById('resultado').innerHTML = `<p id="mensaje-error">Error al cargar datos: ${error.message}</p>`;
+  });
+</script>
+</body>
+</html>
